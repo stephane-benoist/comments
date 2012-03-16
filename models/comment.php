@@ -245,7 +245,7 @@ class Comment extends CommentsAppModel {
 		if (!empty($id)) {
 			$this->id = $id;
 		}
-		$comment = $this->read(array($this->alias . '.' . $this->primaryKey, 'approved'));
+		$comment = $this->read();
 
 		if (!empty($comment)) {
 			if($comment[$this->alias]['approved'] == $approved) {
@@ -257,6 +257,10 @@ class Comment extends CommentsAppModel {
 						$this->changeCount($this->id, 'up');
 					} else {
 						$this->changeCount($this->id, 'down');
+					}
+					$model = ClassRegistry::Init($comment[$this->alias]['model']);
+					if (method_exists($model, 'afterToggleApprove')) {
+						$model->afterToggleApprove($comment);
 					}
 				}
 			}
